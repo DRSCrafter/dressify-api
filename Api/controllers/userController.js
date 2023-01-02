@@ -1,4 +1,4 @@
-export default {
+export default (connection) => ({
     getUsers: (req, res) => {
     }, // 2
     getTopWeek: (req, res) => {
@@ -23,4 +23,4 @@ export default {
     }, // 19
     deleteUserImmediate: (req, res) => {
     } // 21
-}
+})

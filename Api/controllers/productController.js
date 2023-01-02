@@ -1,5 +1,12 @@
-export default {
+export default (connection) => ({
     getProducts: (req, res) => {
+        connection.query(
+            'SELECT * FROM colors',
+            (err, results) => {
+                if (err) return console.log(err);
+                res.send(results); // results contains rows returned by server
+            }
+        );
     }, // 1
     getCategories: (req, res) => {
     }, // 3
@@ -29,4 +36,4 @@ export default {
     }, // 20
     deleteProduct: (req, res) => {
     }, // 20
-}
+})

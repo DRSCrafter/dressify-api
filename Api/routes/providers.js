@@ -1,8 +1,12 @@
 import express from "express";
 import providerController from "../controllers/providerController.js";
 
-const router = express.Router();
+export default (connection) => {
+    const router = express.Router();
 
-router.get('/providers/city/:city', providerController.getProvidersInCity);
+    const controller = providerController(connection);
 
-export default router;
+    router.get('/providers/city/:city', controller.getProvidersInCity);
+
+    return router;
+}
