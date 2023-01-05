@@ -51,7 +51,7 @@ insert into useraddress values ("َشیراز", "ستارخان", 1);
 insert into userphonenumbers values("09352884424", 1);
 
 insert into cart values(default, 0, 1);
-insert into dbproject.order values(default, 3, 1, 1, 450, 1);
+insert into dbproject.order values(default, 3, 1, 1, 450, 1, null);
 insert into comment values(default,  1, 4.5,
  "Product as expected including pant color, and delivered on time. Would order again.", 1);
 
@@ -136,4 +136,13 @@ insert into userphonenumbers values("09035187610",10);
 insert into user values (default, "آرزو", "محمدی", 0, "Arezooooo_m75@gmail.com", "a1298***6", curdate());
 insert into useraddress values ("مشهد", "مجیدیه", 11);
 insert into userphonenumbers values("09051209821",11);
+
+insert into cart values(default, 0, 2);
+insert into discountCode values(default,0.65,2);
+insert into dbproject.order values(default, 2, 2, 2, 15400000, 4, 1);
+insert into discountCode values(default,0.3,2);
+insert into discountCode values(default,0.7,1);
+insert into discountCode values(default,0.2,4);
+insert into discountCode values(default,0.04,5);
+insert into discountCode values(default,0.02,6);
 
