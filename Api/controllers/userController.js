@@ -32,10 +32,10 @@ export default (connection) => ({
                 );
 
                 connection.query(
-                    `select user_id from dbproject.user where email = "${req.body.email}" limit 1;`,
+                    `select user_id from dbproject.user where email = "${req.body.email}";`,
                     (err, results) => {
                         if (err) return console.log(err);
-                        users.push(results[0]);
+                        users.push(results[0].user_id);
                     }
                 );
                 res.send("Done");
@@ -43,6 +43,31 @@ export default (connection) => ({
         );
     }, // 19
     login: (req, res) => {
+        if (!req.body.email || !req.body.password)
+            return res.status(400).send("Invalid User Credentials!");
+
+        connection.query(
+            `select user_id, password from user where email = "${req.body.email}"`,
+            (err, results) => {
+                if (err) return console.log(err);
+
+                const user = results[0];
+
+                if (results.length === 0)
+                    return res.status(404).send("User doesn't exist!");
+
+                const exists = users.find(id => id == user.user_id);
+                if (exists)
+                    return res.status(400).send("User is already logged in!");
+
+                const isVaildPassword = bcrypt.compareSync(req.body.password, user.password);
+                if (!isVaildPassword)
+                    return res.status(400).send("Incorrect Password!");
+
+                users.push(user.user_id);
+                res.send("Success");
+            }
+        )
     }, // 19
     logout: (req, res) => {
     }, // 19 21

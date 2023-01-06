@@ -1,12 +1,7 @@
+import users from "../data/users.js";
+
 export default (connection) => ({
     getProducts: (req, res) => {
-        connection.query(
-            'SELECT * FROM colors',
-            (err, results) => {
-                if (err) return console.log(err);
-                res.send(results); // results contains rows returned by server
-            }
-        );
     }, // 1
     getCategories: (req, res) => {
     }, // 3
