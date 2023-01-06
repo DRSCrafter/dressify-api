@@ -1,6 +1,8 @@
 import users from '../data/users.js';
 import bcrypt from "bcrypt";
 
+const editableEntities = ["first_name", "last_name", "isAdmin"];
+
 export default (connection) => ({
     getUsers: (req, res) => {
     }, // 2
@@ -70,8 +72,68 @@ export default (connection) => ({
         )
     }, // 19
     logout: (req, res) => {
+        connection.query(
+            `select user_id from user where email = "${req.body.email}"`,
+            (err, results) => {
+                if (err) return console.log(err);
+
+                const user = results[0];
+
+                if (results.length === 0)
+                    return res.status(404).send("User doesn't exist!");
+
+                const exists = users.find(id => id == user.user_id);
+                if (!exists)
+                    return res.status(400).send("User is not logged in!");
+
+                const index = users.findIndex(id => id == user.user_id);
+                users.splice(index, 1);
+                console.log(users);
+                res.send("Success");
+            }
+        )
     }, // 19 21
     editUser: (req, res) => {
+        const data = req.body;
+
+        if (!data.email)
+            return res.status(400).send("User E-mail is needed!");
+
+        if (data.user_id || data.isAdmin)
+            return res.status(403).send("Can't change User's signature");
+
+        connection.query(
+            `select exists (select user_id from user where email = "${data.email}") AS "exists";`,
+            (err, results) => {
+                if (results[0].exists === 0)
+                    return res.status(400).send("User doesn't exist!");
+            }
+        )
+
+        let query = "Update user set ";
+        for (let entity of Object.keys(data)) {
+            if (entity !== "email" && !editableEntities.includes(entity))
+                return res.status(400).send("Invalid entities can't be edited!");
+            if (entity === "password") {
+                const salt = bcrypt.genSaltSync(10);
+                const password = bcrypt.hashSync(data.password, salt);
+                query += `password = "${password}", `;
+                continue;
+            }
+            query += `${entity} = "${data[entity]}", `;
+        }
+        const index = query.lastIndexOf(",");
+        query = query.slice(0, index);
+
+        query += ` where email = "${data.email}";`;
+
+        connection.query(
+            query,
+            (err, results) => {
+                if (err) return console.log(err);
+                res.send("Success!");
+            }
+        )
     }, // 19 21
     deleteUser: (req, res) => {
     }, // 19
