@@ -17,7 +17,6 @@ export default (connection) => {
     router.post('/logout', controller.logout);
     router.put('/', controller.editUser);
     router.delete('/', controller.deleteUser);
-    router.delete('/immediate', controller.deleteUserImmediate);
 
     return router;
 }

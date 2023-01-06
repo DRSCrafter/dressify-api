@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 
 const editableEntities = ["first_name", "last_name", "isAdmin"];
 
-export default (connection) => ({
+const controllers = (connection) => ({
     getUsers: (req, res) => {
     }, // 2
     getTopWeek: (req, res) => {
@@ -27,7 +27,7 @@ export default (connection) => ({
                 const password = bcrypt.hashSync(req.body.password, salt);
 
                 connection.query(
-                    `insert into dbproject.user values(default, "${req.body.firstname}", "${req.body.lastname}", default, "${req.body.email}", "${password}", curdate());`,
+                    `insert into dbproject.user values(default, "${req.body.first_name}", "${req.body.last_name}", default, "${req.body.email}", "${password}", curdate());`,
                     (err) => {
                         if (err) return console.log(err);
                     }
@@ -129,14 +129,22 @@ export default (connection) => ({
 
         connection.query(
             query,
-            (err, results) => {
+            (err) => {
                 if (err) return console.log(err);
                 res.send("Success!");
             }
         )
     }, // 19 21
     deleteUser: (req, res) => {
+        controllers(connection).logout(req, res);
+        connection.query(
+            `delete from user where email = "${req.body.email}"`,
+            (err) => {
+                if (err) return res.send(err);
+            }
+        )
     }, // 19
-    deleteUserImmediate: (req, res) => {
-    } // 21
 })
+
+
+export default controllers;
