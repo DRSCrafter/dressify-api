@@ -1,5 +1,8 @@
 import users from "../utils/users.js";
 import connection from '../utils/db.js';
+import bcrypt from "bcrypt";
+
+const editableEntities = ["name", "discountable", "size", "material", "stock"];
 
 export default {
     getProducts: (req, res) => {
@@ -37,6 +40,41 @@ export default {
             })
     }, // 20
     editProduct: (req, res) => {
+        const data = req.body;
+
+        if (!data.product_id)
+            return res.status(400).send("Product ID is needed!");
+
+        if (data.ProductCategory_category_id)
+            return res.status(403).send("Can't change Product's signature");
+
+        connection.query(
+            `select exists (select product_id from product where product_id = "${data.product_id}") AS "exists";`,
+            (err, results) => {
+                if (results[0].exists === 0)
+                    return res.status(400).send("Product doesn't exist!");
+
+                let query = "Update product set ";
+                for (let entity of Object.keys(data)) {
+                    if (entity !== "product_id" && !editableEntities.includes(entity))
+                        return res.status(400).send("Invalid entities can't be edited!");
+                    query += `${entity} = "${data[entity]}", `;
+                }
+                const index = query.lastIndexOf(",");
+                query = query.slice(0, index);
+
+                query += ` where product_id = "${data.product_id}";`;
+
+                connection.query(
+                    query,
+                    (err) => {
+                        if (err) return console.log(err);
+                        res.send("Success!");
+                    }
+                )
+            }
+        )
+
     }, // 20
     deleteProduct: (req, res) => {
         connection.query(

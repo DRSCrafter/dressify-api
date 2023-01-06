@@ -108,33 +108,34 @@ const controllers = {
             (err, results) => {
                 if (results[0].exists === 0)
                     return res.status(400).send("User doesn't exist!");
+
+                let query = "Update user set ";
+                for (let entity of Object.keys(data)) {
+                    if (entity !== "email" && !editableEntities.includes(entity))
+                        return res.status(400).send("Invalid entities can't be edited!");
+                    if (entity === "password") {
+                        const salt = bcrypt.genSaltSync(10);
+                        const password = bcrypt.hashSync(data.password, salt);
+                        query += `password = "${password}", `;
+                        continue;
+                    }
+                    query += `${entity} = "${data[entity]}", `;
+                }
+                const index = query.lastIndexOf(",");
+                query = query.slice(0, index);
+
+                query += ` where email = "${data.email}";`;
+
+                connection.query(
+                    query,
+                    (err) => {
+                        if (err) return console.log(err);
+                        res.send("Success!");
+                    }
+                )
             }
         )
 
-        let query = "Update user set ";
-        for (let entity of Object.keys(data)) {
-            if (entity !== "email" && !editableEntities.includes(entity))
-                return res.status(400).send("Invalid entities can't be edited!");
-            if (entity === "password") {
-                const salt = bcrypt.genSaltSync(10);
-                const password = bcrypt.hashSync(data.password, salt);
-                query += `password = "${password}", `;
-                continue;
-            }
-            query += `${entity} = "${data[entity]}", `;
-        }
-        const index = query.lastIndexOf(",");
-        query = query.slice(0, index);
-
-        query += ` where email = "${data.email}";`;
-
-        connection.query(
-            query,
-            (err) => {
-                if (err) return console.log(err);
-                res.send("Success!");
-            }
-        )
     }, // 19 21
     deleteUser: (req, res) => {
         controllers.logout(req, res);
