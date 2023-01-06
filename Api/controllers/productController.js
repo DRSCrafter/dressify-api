@@ -27,9 +27,23 @@ export default {
     getAverageSales: (req, res) => {
     }, // 16
     postProduct: (req, res) => {
+        const data = req.body;
+
+        connection.query(
+            `insert into product values (default, "${data.name}", ${data.discountable}, "${data.size}", "${data.material}", ${req.body.stock}, ${data.category})`,
+            (err, results) => {
+                if (err) return console.log(err);
+                res.send("Success!");
+            })
     }, // 20
     editProduct: (req, res) => {
     }, // 20
     deleteProduct: (req, res) => {
+        connection.query(
+            `delete from product where name = ${req.body.name}`,
+            (err, results) => {
+                if (err) return console.log(err);
+                res.send("Success!");
+            })
     }, // 20
 }
