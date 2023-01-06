@@ -1,6 +1,7 @@
 import mysql from "mysql2";
 
 const connection = mysql.createConnection({
+    multipleStatements: true,
     host: 'localhost',
     user: 'arasteh',
     password: 'sql0012',

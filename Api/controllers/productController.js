@@ -1,6 +1,4 @@
-import users from "../utils/users.js";
 import connection from '../utils/db.js';
-import bcrypt from "bcrypt";
 
 const editableEntities = ["name", "discountable", "size", "material", "stock"];
 
@@ -33,11 +31,20 @@ export default {
         const data = req.body;
 
         connection.query(
-            `insert into product values (default, "${data.name}", ${data.discountable}, "${data.size}", "${data.material}", ${req.body.stock}, ${data.category})`,
+            `select exists (select product_id from product where name = "${data.name}") AS "exists";`,
             (err, results) => {
-                if (err) return console.log(err);
-                res.send("Success!");
-            })
+                if (results[0].exists === 1)
+                    return res.status(400).send("Product with this name already exists");
+
+                connection.query(
+                    `insert into product values (default, "${data.name}", ${data.discountable}, "${data.size}", "${data.material}", ${data.stock}, ${data.category})`,
+                    (err, results) => {
+                        if (err) return console.log(err);
+                        res.send("Success!");
+                    });
+            }
+        );
+
     }, // 20
     editProduct: (req, res) => {
         const data = req.body;
@@ -78,10 +85,21 @@ export default {
     }, // 20
     deleteProduct: (req, res) => {
         connection.query(
-            `delete from product where name = ${req.body.name}`,
+            `select exists (select product_id from product where name = "${req.body.name}") AS "exists";`,
             (err, results) => {
                 if (err) return console.log(err);
-                res.send("Success!");
-            })
+
+                if (results[0].exists === 0)
+                    return res.status(400).send("Product doesn't exist");
+
+                connection.query(
+                    `delete from product where name = "${req.body.name}";`,
+                    (err, results) => {
+                        if (err) return console.log(err);
+                        res.send("Success!");
+                    }
+                );
+            }
+        )
     }, // 20
 }
