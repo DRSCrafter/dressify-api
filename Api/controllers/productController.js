@@ -1,6 +1,7 @@
-import users from "../data/users.js";
+import users from "../utils/users.js";
+import connection from '../utils/db.js';
 
-export default (connection) => ({
+export default {
     getProducts: (req, res) => {
     }, // 1
     getCategories: (req, res) => {
@@ -31,4 +32,4 @@ export default (connection) => ({
     }, // 20
     deleteProduct: (req, res) => {
     }, // 20
-})
+}

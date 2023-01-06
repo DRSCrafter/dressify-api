@@ -1,22 +1,18 @@
 import express from "express";
 import userController from "../controllers/userController.js";
 
-export default (connection) => {
-    const router = express.Router();
+const router = express.Router();
 
-    const controller = userController(connection);
+router.get('/', userController.getUsers);
+router.get('/:userID/:cart/orders', userController.getOrders);
+router.get('/:userID/topweek', userController.getTopWeek);
+router.get('/:userID/topmonth', userController.getTopMonth);
+router.get('/:userID/latestorders', userController.getLatestOrders);
+router.get('/city/:city', userController.getUsersInCity);
+router.post('/', userController.signUp);
+router.post('/login', userController.login);
+router.post('/logout', userController.logout);
+router.put('/', userController.editUser);
+router.delete('/', userController.deleteUser);
 
-    router.get('/', controller.getUsers);
-    router.get('/:userID/:cart/orders', controller.getOrders);
-    router.get('/:userID/topweek', controller.getTopWeek);
-    router.get('/:userID/topmonth', controller.getTopMonth);
-    router.get('/:userID/latestorders', controller.getLatestOrders);
-    router.get('/city/:city', controller.getUsersInCity);
-    router.post('/', controller.signUp);
-    router.post('/login', controller.login);
-    router.post('/logout', controller.logout);
-    router.put('/', controller.editUser);
-    router.delete('/', controller.deleteUser);
-
-    return router;
-}
+export default router;

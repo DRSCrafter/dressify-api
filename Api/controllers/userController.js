@@ -1,9 +1,10 @@
-import users from '../data/users.js';
+import users from '../utils/users.js';
 import bcrypt from "bcrypt";
+import connection from '../utils/db.js';
 
 const editableEntities = ["first_name", "last_name", "isAdmin"];
 
-const controllers = (connection) => ({
+const controllers = {
     getUsers: (req, res) => {
     }, // 2
     getTopWeek: (req, res) => {
@@ -136,7 +137,7 @@ const controllers = (connection) => ({
         )
     }, // 19 21
     deleteUser: (req, res) => {
-        controllers(connection).logout(req, res);
+        controllers.logout(req, res);
         connection.query(
             `delete from user where email = "${req.body.email}"`,
             (err) => {
@@ -144,7 +145,7 @@ const controllers = (connection) => ({
             }
         )
     }, // 19
-})
+}
 
 
 export default controllers;

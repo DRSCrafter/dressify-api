@@ -1,26 +1,22 @@
 import express from "express";
 import productController from "../controllers/productController.js";
 
-export default (connection) => {
-    const router = express.Router();
+const router = express.Router();
 
-    const controller = productController(connection);
+router.get('/', productController.getProducts);
+router.get('/categories', productController.getCategories);
+router.get('/topweek', productController.getTopWeek);
+router.get('topmonth', productController.getTopMonth);
+router.get('/specialmonth', productController.getSpecialOff);
+router.get('/:productID/providers', productController.getProviders);
+router.get('/:productID/cheapestprovider', productController.getCheapestProvider);
+router.get('/:productID/comments', productController.getComments);
+router.get('/:productID/bestcomments', productController.getBestComments);
+router.get('/:productID/worstcomments', productController.getWorstComments);
+router.get('/:productID/salesstats', productController.getSalesStats);
+router.get('/:productID/averagesales', productController.getAverageSales);
+router.post('/', productController.postProduct);
+router.put('/', productController.editProduct);
+router.delete('/', productController.deleteProduct);
 
-    router.get('/', controller.getProducts);
-    router.get('/categories', controller.getCategories);
-    router.get('/topweek', controller.getTopWeek);
-    router.get('topmonth', controller.getTopMonth);
-    router.get('/specialmonth', controller.getSpecialOff);
-    router.get('/:productID/providers', controller.getProviders);
-    router.get('/:productID/cheapestprovider', controller.getCheapestProvider);
-    router.get('/:productID/comments', controller.getComments);
-    router.get('/:productID/bestcomments', controller.getBestComments);
-    router.get('/:productID/worstcomments', controller.getWorstComments);
-    router.get('/:productID/salesstats', controller.getSalesStats);
-    router.get('/:productID/averagesales', controller.getAverageSales);
-    router.post('/', controller.postProduct);
-    router.put('/', controller.editProduct);
-    router.delete('/', controller.deleteProduct);
-
-    return router;
-}
+export default router;
