@@ -16,29 +16,29 @@ insert into productcategory values
     (default, "jacket"),
     (default, "jeans"),
     (default, "hat");
-    
-insert into provider values (default, "Puma");
-insert into provideraddresses values ("PUMA SE PUMA WAY 1 91074 Herzogenaurach, GERMANY", 1);
 
-insert into provider values (default, "Reebook");
-insert into provideraddresses values ("25 Drydock Ave, Boston, MA 02210,", 2);
+insert into provider values (default, "Puma");
+insert into provideraddresses values ("GERMANY", "Herzogenaurach", "PUMA SE PUMA WAY 1 91074", 1);
+
+insert into provider values (default, "Reebok");
+insert into provideraddresses values ("United States", "Boston", "25 Drydock Ave", 2);
+
 
 insert into provider values (default, "Lulus");
-insert into provideraddresses values ("Chico, California, US", 3);
+insert into provideraddresses values ("United States", "California", "Chico", 3);
 
 insert into provider values (default, "هاکوپیان");
-insert into provideraddresses values ("تهران، خیابان پاسداران، خیبان بوستان پنجم", 4); 
-insert into provideraddresses values ("تهران، خیابان مطهری، خیابان فجر", 4);
+insert into provideraddresses values ("ایران","تهران","خیابان پاسداران، خیبان بوستا", 4); 
+insert into provideraddresses values ("ایران", "تهران", "خیابان مطهری، خیابان فجر", 4);
 
 insert into provider values (default, "تندرست");
-insert into provideraddresses values ("مشهذ، خیابان راهنمای 3", 5); 
-insert into provideraddresses values ("تهران، خیابان اندرزگو،", 5);
+insert into provideraddresses values ("ایران", "مشهد", "۳ خیابان راهنمای", 5); 
+insert into provideraddresses values ("ایران", "تهران", "خیابان اندرزگو", 5);
 
 insert into provider values (default, "چرم مشهد");
-insert into provideraddresses values ("مشهد، احمدآباد، نبش رضا، جنب بانک رفاه", 6); 
-insert into provideraddresses values ("مشهد، بلوار سجاد، چهارراه بزرگمهر، جنب پاساژ پردیس", 6);
-insert into provideraddresses values ("مشهد، بلوار وکیل آباد، برج آرمیتاژ گلشن", 6);
-
+insert into provideraddresses values ("ایران", "مشهد", "احمدآباد، نبش رضا، جنب بانک رفاه", 6); 
+insert into provideraddresses values ("ایران", "مشهد", "بلوار سجاد، چهارراه بزرگمهر، جنب پاساژ پردیس", 6);
+insert into provideraddresses values ("ایران", "مشهد", "بلوار وکیل آباد، برج آرمیتاژ گلشن", 6);
     
 insert into product values(default, "شلوار جین آبی", 0, "M", "Polyester", 15, 1);
 insert into productcolors values(1, 1);
