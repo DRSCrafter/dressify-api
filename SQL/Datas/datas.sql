@@ -98,13 +98,34 @@ insert into useraddress values ("شیراز", "پاسداران", 1);
 insert into useraddress values ("شیراز", "ستارخان", 1);
 insert into userphonenumbers values("09352884424", 1);
 
+
 insert into cart values(default, 0, 1);
-insert into dbproject.order values(default, 3, 1, 1, 4500000, 1, null);
+insert into cart values(default, 0, 1);
+insert into cart values(default, 0, 1);
+
 insert into comment values(default,  1, 4.5,
  "Product as expected including pant color, and delivered on time. Would order again.", 1);
 
-insert into payment values(default, 4500000, "2023-1-3", 1);
+
+insert into payment values(4500000, "2023-1-7", 1);
+insert into payment values(360, "2023-1-5", 2);
+insert into payment values(360, "2023-1-1", 3);
+
 insert into shipment values(default, "2023-1-5", 1);
+
+insert into dbproject.order values(default, 3, 1, 1, 450, 1, null);
+insert into dbproject.order values(default, 2, 1, 1, 320, 1, null);
+insert into dbproject.order values(default, 1, 2, 2, 740, 1, null);
+insert into dbproject.order values(default, 7, 2, 3, 1000, 1, null);
+insert into dbproject.order values(default, 2, 2, 4, 500, 1, null);
+insert into dbproject.order values(default, 4, 1, 4, 832, 1, null);
+insert into dbproject.order values(default, 2, 2, 7, 500, 1, null);
+insert into dbproject.order values(default, 3, 1, 7, 500, 1, null);
+insert into dbproject.order values(default, 1, 1, 2, 500, 1, null);
+insert into dbproject.order values(default, 2, 1, 2, 500, 1, null);
+insert into dbproject.order values(default, 12, 3, 6, 500, 1, null);
+insert into dbproject.order values(default, 23, 3, 6, 500, 1, null);
+insert into dbproject.order values(default, 5, 3, 6, 500, 1, null);
 
 -- user 2
 insert into user values (default, "معصومه", "کشاورز", 0, "masoume.keshavarz@gmail.com", "masoume234*", "2022-11-26");
@@ -113,12 +134,12 @@ insert into useraddress values ("مشهد", "وکیل آباد", 2);
 insert into userphonenumbers values("09035129832", 2);
 insert into cart values(default, 0, 2);
 insert into dbproject.order values(default, 2, 2, 3, 11200000, 2, null);
-insert into payment values(default, 11200000, "2023-1-5", 2);
+insert into payment values( 11200000, "2023-1-5", 4);
 
 insert into comment values(default,  1, 3.5, "شلوار کمی تنگ بود", 2);
 insert into cart values(default, 0, 2);
 insert into dbproject.order values(default, 5, 3, 6, 7500000, 2, null);
-insert into payment values(default, 7500000, "2023-1-1", 3);
+insert into payment values( 7500000, "2023-1-1", 5);
 
 -- user 3
 insert into user values (default, "سینا", "زارعی", 0, "sina34z@gmail.com", "qweert34!#", "2022-12-06");
