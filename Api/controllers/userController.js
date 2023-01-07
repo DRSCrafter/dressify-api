@@ -28,7 +28,7 @@ const controllers = {
                 const password = bcrypt.hashSync(req.body.password, salt);
 
                 connection.query(
-                    `insert into dbproject.user values(default, "${req.body.first_name}", "${req.body.last_name}", default, "${req.body.email}", "${password}", curdate());`,
+                    `insert into dbproject.user values(default, "${req.body.first_name}", "${req.body.last_name}", ${req.body.isAdmin}, "${req.body.email}", "${password}", curdate());`,
                     (err) => {
                         if (err) return console.log(err);
                     }
