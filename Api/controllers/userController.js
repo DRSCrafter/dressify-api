@@ -6,20 +6,109 @@ const editableEntities = ["first_name", "last_name", "isAdmin"];
 
 const controllers = {
     getUsers: (req, res) => {
+        // SELECT * FROM dbproject.user;
+        connection.query(
+            'SELECT * FROM dbproject.user;',
+            (err, results) => {
+                if (err) return console.log(err);
+                res.send(results);
+            }
+        )
     }, // 2
     getTopWeek: (req, res) => {
+        // select user_id, sum(cost) as totalBuy
+        // from user, cart, payment
+        // where user_id = User_user_id and cart_id = Cart_cart_id and
+        // year(payment.date_paid) = year(now()) and week(payment.date_paid) = week(now())
+        // group by user_id
+        // order by totalBuy desc;
+        connection.query(
+            'select user_id, sum(cost) as totalBuy ' +
+                'from user, cart, payment ' +
+                'where user_id = User_user_id and cart_id = Cart_cart_id and year(payment.date_paid) = year(now()) and week(payment.date_paid) = week(now()) ' +
+                'group by user_id ' +
+                'order by totalBuy desc;',
+            (err, results) => {
+                if (err) return console.log(err);
+                res.send(results);
+            }
+        )
     }, // 5
     getTopMonth: (req, res) => {
+        // select user_id, sum(cost) as totalBuy
+        // from user, cart, payment
+        // where user_id = User_user_id and cart_id = Cart_cart_id and
+        // year(payment.date_paid) = year(now()) and month(payment.date_paid) = month(now())
+        // group by user_id
+        // order by totalBuy desc;
+        connection.query(
+            'select user_id, sum(cost) as totalBuy ' +
+                'from user, cart, payment ' +
+                'where user_id = User_user_id and cart_id = Cart_cart_id and year(payment.date_paid) = year(now()) and month(payment.date_paid) = month(now()) ' +
+                'group by user_id ' +
+                'order by totalBuy desc;',
+            (err, results) => {
+                if (err) return console.log(err);
+                res.send(results);
+            }
+        )
     }, // 5
     getOrders: (req, res) => {
+        // select o.order_id, p.name, o.quantity, o.total_cost, o.DiscountCode_discount_code_id
+        // from user u, dbproject.order o, product p
+        // where u.user_id = o.User_user_id and o.Product_product_id = p.product_id
+        // and u.user_id = 1;
+        connection.query(
+            'select o.order_id, p.name, o.quantity, o.total_cost, o.DiscountCode_discount_code_id ' +
+                'from user u, dbproject.order o, product p ' +
+                'where u.user_id = o.User_user_id and o.Product_product_id = p.product_id ' +
+                'and u.user_id = ${req.params.userID};',
+            (err, results) => {
+                if (err) return console.log(err);
+                res.send(results);
+            }
+        )
     }, // 4
     getLatestOrders: (req, res) => {
+        // select Product_product_id, quantity, total_cost
+        // from  user u  join dbproject.order o on  u.user_id = o.User_user_id join cart c on o.Cart_cart_id = c.cart_id
+        // join payment p on c.cart_id = p.Cart_cart_id
+        // where u.user_id = 1
+        // order by date_paid desc limit 10;
+        connection.query(
+            `select Product_product_id, quantity, total_cost 
+                 from user u 
+                 join dbproject.order o on 
+                 u.user_id = o.User_user_id 
+                 join cart c 
+                 on o.Cart_cart_id = c.cart_id 
+                 join payment p 
+                 on c.cart_id = p.Cart_cart_id 
+                 where u.user_id = "${req.params.userID}" 
+                 order by date_paid desc 
+                 limit 10;`,
+            (err, results) => {
+                if (err) return console.log(err);
+                res.send(results);
+            }
+        )
     }, // 11
     getUsersInCity: (req, res) => {
+        // SELECT distinct first_name, last_name FROM user u join useraddress ua on u.user_id = ua.User_user_id
+        // where ua.city = "مشهد";
+        connection.query(
+            `SELECT distinct first_name, last_name 
+                 FROM user u join useraddress ua on u.user_id = ua.User_user_id 
+                 where ua.city = "${req.params.city}";`,
+            (err, results) => {
+                if (err) return console.log(err);
+                res.send(results);
+            }
+        )
     }, // 17
     signUp: (req, res) => {
         connection.query(
-            `select exists (select user_id from user where email = "${req.body.email}") AS "exists";`,
+            `select exists(select user_id from user where email = "${req.body.email}") AS "exists";`,
             (err, results) => {
                 if (err) return console.log(err);
                 if (results[0].exists) return res.send("User Already Exists");
@@ -28,14 +117,18 @@ const controllers = {
                 const password = bcrypt.hashSync(req.body.password, salt);
 
                 connection.query(
-                    `insert into dbproject.user values(default, "${req.body.first_name}", "${req.body.last_name}", ${req.body.isAdmin}, "${req.body.email}", "${password}", curdate());`,
+                    `insert into dbproject.user
+                     values (default, "${req.body.first_name}", "${req.body.last_name}", ${req.body.isAdmin},
+                             "${req.body.email}", "${password}", curdate());`,
                     (err) => {
                         if (err) return console.log(err);
                     }
                 );
 
                 connection.query(
-                    `select user_id from dbproject.user where email = "${req.body.email}";`,
+                    `select user_id
+                     from dbproject.user
+                     where email = "${req.body.email}";`,
                     (err, results) => {
                         if (err) return console.log(err);
                         users.push(results[0].user_id);
@@ -50,7 +143,9 @@ const controllers = {
             return res.status(400).send("Invalid User Credentials!");
 
         connection.query(
-            `select user_id, password from user where email = "${req.body.email}"`,
+            `select user_id, password
+             from user
+             where email = "${req.body.email}"`,
             (err, results) => {
                 if (err) return console.log(err);
 
@@ -74,7 +169,9 @@ const controllers = {
     }, // 19
     logout: (req, res) => {
         connection.query(
-            `select user_id from user where email = "${req.body.email}"`,
+            `select user_id
+             from user
+             where email = "${req.body.email}"`,
             (err, results) => {
                 if (err) return console.log(err);
 
@@ -104,7 +201,7 @@ const controllers = {
             return res.status(403).send("Can't change User's signature");
 
         connection.query(
-            `select exists (select user_id from user where email = "${data.email}") AS "exists";`,
+            `select exists(select user_id from user where email = "${data.email}") AS "exists";`,
             (err, results) => {
                 if (results[0].exists === 0)
                     return res.status(400).send("User doesn't exist!");
