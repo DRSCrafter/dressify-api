@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="readme_assets/logo.png" alt="Logo" width="80" height="80">
+  <img src="readme_assets/logo.png" alt="Logo" width="90" height="90">
 
   <h3 align="center">Dressify-API</h3>
 
@@ -17,10 +17,6 @@
 ![](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
 ![](https://img.shields.io/badge/MySQL-005C84?style=for-the-badge&logo=mysql&logoColor=white)
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
 <!-- GETTING STARTED -->
 ## Getting Started
 
@@ -28,19 +24,24 @@
    ```sh
    git clone https://github.com/DRSCrafter/dressify-api.git
    ```
-2. Install NPM packages
+2. Go inside the API folder
+   ```sh
+   cd Api
+   ```
+3. Install the dependencies
    ```sh
    npm install
    ```
-3. Run the API
-   ```js
-   node API/index.js
+4. Run the API
+   ```sh
+   npm start
+   ```
+   or if you want to debug the API
+   ```sh
+   npm run debug
    ```
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- CONTRIBUTERS -->
-## Contributers
+## Contributors
 
 Contributions are what make the open source community such an amazing place to learn, inspire, and create.
 
@@ -50,5 +51,3 @@ Contributions are what make the open source community such an amazing place to l
 <li><a href="https://github.com/Arash-81">Arash Gholamdokht</a></li>
 <li><a href="https://github.com/DRSCrafter">Mohammad Reza Arasteh</a></li>
 </ul>
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
