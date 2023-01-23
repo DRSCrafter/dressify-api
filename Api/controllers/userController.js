@@ -6,9 +6,9 @@ const editableEntities = ["first_name", "last_name", "isAdmin"];
 
 const controllers = {
     getUsers: (req, res) => {
-        // SELECT * FROM dbproject.user;
+        // SELECT * FROM user;
         connection.query(
-            'SELECT * FROM dbproject.user;',
+            `SELECT * FROM user;`,
             (err, results) => {
                 if (err) return console.log(err);
                 res.send(results);
@@ -59,10 +59,10 @@ const controllers = {
         // where u.user_id = o.User_user_id and o.Product_product_id = p.product_id
         // and u.user_id = 1;
         connection.query(
-            'select o.order_id, p.name, o.quantity, o.total_cost, o.DiscountCode_discount_code_id ' +
-                'from user u, dbproject.order o, product p ' +
-                'where u.user_id = o.User_user_id and o.Product_product_id = p.product_id ' +
-                'and u.user_id = ${req.params.userID};',
+            `select o.order_id, p.name, o.quantity, o.total_cost, o.DiscountCode_discount_code_id 
+                from user u, ${process.env.DB_NAME}.order o, product p 
+                where u.user_id = o.User_user_id and o.Product_product_id = p.product_id 
+                and u.user_id = ${req.params.userID};`,
             (err, results) => {
                 if (err) return console.log(err);
                 res.send(results);
@@ -78,7 +78,7 @@ const controllers = {
         connection.query(
             `select Product_product_id, quantity, total_cost 
                  from user u 
-                 join dbproject.order o on 
+                 join ${process.env.DB_NAME}.order o on 
                  u.user_id = o.User_user_id 
                  join cart c 
                  on o.Cart_cart_id = c.cart_id 
@@ -117,7 +117,7 @@ const controllers = {
                 const password = bcrypt.hashSync(req.body.password, salt);
 
                 connection.query(
-                    `insert into dbproject.user
+                    `insert into ${process.env.DB_NAME}.user
                      values (default, "${req.body.first_name}", "${req.body.last_name}", ${req.body.isAdmin},
                              "${req.body.email}", "${password}", curdate());`,
                     (err) => {
@@ -127,7 +127,7 @@ const controllers = {
 
                 connection.query(
                     `select user_id
-                     from dbproject.user
+                     from ${process.env.DB_NAME}.user
                      where email = "${req.body.email}";`,
                     (err, results) => {
                         if (err) return console.log(err);
