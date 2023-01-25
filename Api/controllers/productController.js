@@ -101,7 +101,7 @@ export default {
         connection.query(
             `select p.name 
                  from provider p, pricehistory ph 
-                 where p.provider_id = ph.Provider_provider_id and value = (select min(value) from pricehistory where Product_product_id = ${req.params.productID});`,
+                 where p.provider_id = ph.Provider_provider_id and value = (select min(value) from pricehistory where Product_product_id = ${req.params.productID}) limit 1;`,
             (err, results) => {
                 if (err) return console.log(err);
                 res.send(results);
@@ -178,7 +178,7 @@ export default {
         // from payment p, cart c, dbproject.order o, product pr
         // where p.Cart_cart_id = c.cart_id and c.cart_id = o.Cart_cart_id and o.Product_product_id = pr.product_id;
         connection.query(
-            `select avg(p.cost), count(*) 
+            `select avg(p.cost) AS "Average sales", count(*) AS "Sales Count" 
                 from payment p, cart c, ${process.env.DB_NAME}.order o, product pr 
                 where p.Cart_cart_id = c.cart_id and c.cart_id = o.Cart_cart_id and o.Product_product_id = pr.product_id;`,
             (err, results) => {

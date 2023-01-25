@@ -3,6 +3,6 @@ import providerController from "../controllers/providerController.js";
 
 const router = express.Router();
 
-router.get('/providers/city/:city', providerController.getProvidersInCity);
+router.get('/city/:city', providerController.getProvidersInCity);
 
 export default router;

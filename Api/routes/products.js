@@ -8,7 +8,7 @@ const router = express.Router();
 router.get('/', productController.getProducts);
 router.get('/categories', productController.getCategories);
 router.get('/topweek', productController.getTopWeek);
-router.get('topmonth', productController.getTopMonth);
+router.get('/topmonth', productController.getTopMonth);
 router.get('/specialmonth', productController.getSpecialOff);
 router.get('/:productID/providers', [auth, admin], productController.getProviders);
 router.get('/:productID/cheapestprovider', [auth, admin], productController.getCheapestProvider);
