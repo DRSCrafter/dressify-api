@@ -17,6 +17,8 @@
 ![](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
 ![](https://img.shields.io/badge/MySQL-005C84?style=for-the-badge&logo=mysql&logoColor=white)
 
+<br/>
+
 <!-- GETTING STARTED -->
 ## Getting Started
 
@@ -32,7 +34,14 @@
    ```sh
    npm install
    ```
-4. Run the API
+4. Set Database info
+   ```sh
+   echo "DB_HOST=yourHost
+         DB_USERNAME=yourDBUsername
+         DB_PASSWORD=yourDBPassword
+         DB_NAME=yourDBName" >> .env
+   ```
+5. Run the API
    ```sh
    npm start
    ```
@@ -40,6 +49,8 @@
    ```sh
    npm run debug
    ```
+   
+<br/>
 
 ## Contributors
 
