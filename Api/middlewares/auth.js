@@ -1,11 +1,11 @@
-import connection from "../utils/db.js";
+import {db} from "../utils/db.js";
 import users from '../utils/users.js';
 
 export default (req, res, next) => {
     if (!req.header("x-auth-email"))
         return res.status(400).send("Authorization headers are ");
 
-    connection.query(
+    db.query(
         `select user_id from user where email = "${req.header("x-auth-email")}";`,
         (err, results) => {
             if (!results || results.length === 0)

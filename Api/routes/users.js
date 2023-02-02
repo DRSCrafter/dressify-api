@@ -1,11 +1,10 @@
 import express from "express";
 import userController from "../controllers/userController.js";
 import auth from "../middlewares/auth.js";
-import admin from "../middlewares/admin.js";
 
 const router = express.Router();
 
-router.get('/', [auth, admin], userController.getUsers);
+router.get('/', auth, userController.getUsers);
 router.get('/:userID/orders', auth, userController.getOrders);
 router.get('/:userID/latestorders', auth, userController.getLatestOrders);
 router.get('/city/:city', userController.getUsersInCity);

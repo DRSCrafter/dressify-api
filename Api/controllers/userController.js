@@ -1,13 +1,13 @@
 import users from '../utils/users.js';
 import bcrypt from "bcrypt";
-import connection from '../utils/db.js';
+import {db, admin} from '../utils/db.js';
 
 const editableEntities = ["first_name", "last_name", "isAdmin"];
 
 const controllers = {
     getUsers: (req, res) => {
         // SELECT * FROM user;
-        connection.query(
+        admin.query(
             `SELECT * FROM user;`,
             (err, results) => {
                 if (err) return console.log(err);
@@ -22,7 +22,7 @@ const controllers = {
         // year(payment.date_paid) = year(now()) and week(payment.date_paid) = week(now())
         // group by user_id
         // order by totalBuy desc;
-        connection.query(
+        db.query(
             'select user_id, sum(cost) as totalBuy ' +
                 'from user, cart, payment ' +
                 'where user_id = User_user_id and cart_id = Cart_cart_id and year(payment.date_paid) = year(now()) and week(payment.date_paid) = week(now()) ' +
@@ -41,7 +41,7 @@ const controllers = {
         // year(payment.date_paid) = year(now()) and month(payment.date_paid) = month(now())
         // group by user_id
         // order by totalBuy desc;
-        connection.query(
+        db.query(
             'select user_id, sum(cost) as totalBuy ' +
                 'from user, cart, payment ' +
                 'where user_id = User_user_id and cart_id = Cart_cart_id and year(payment.date_paid) = year(now()) and month(payment.date_paid) = month(now()) ' +
@@ -58,9 +58,9 @@ const controllers = {
         // from user u, dbproject.order o, product p
         // where u.user_id = o.User_user_id and o.Product_product_id = p.product_id
         // and u.user_id = 1;
-        connection.query(
+        db.query(
             `select o.order_id, p.name, o.quantity, o.total_cost, o.DiscountCode_discount_code_id 
-                from user u, ${process.env.DB_NAME}.order o, product p 
+                from user u, dbproject.order o, product p 
                 where u.user_id = o.User_user_id and o.Product_product_id = p.product_id 
                 and u.user_id = ${req.params.userID};`,
             (err, results) => {
@@ -75,10 +75,10 @@ const controllers = {
         // join payment p on c.cart_id = p.Cart_cart_id
         // where u.user_id = 1
         // order by date_paid desc limit 10;
-        connection.query(
+        db.query(
             `select Product_product_id, quantity, total_cost 
                  from user u 
-                 join ${process.env.DB_NAME}.order o on 
+                 join dbproject.order o on 
                  u.user_id = o.User_user_id 
                  join cart c 
                  on o.Cart_cart_id = c.cart_id 
@@ -96,7 +96,7 @@ const controllers = {
     getUsersInCity: (req, res) => {
         // SELECT distinct first_name, last_name FROM user u join useraddress ua on u.user_id = ua.User_user_id
         // where ua.city = "مشهد";
-        connection.query(
+        db.query(
             `SELECT distinct first_name, last_name 
                  FROM user u join useraddress ua on u.user_id = ua.User_user_id 
                  where ua.city = "${req.params.city}";`,
@@ -107,7 +107,7 @@ const controllers = {
         )
     }, // 17
     signUp: (req, res) => {
-        connection.query(
+        db.query(
             `select exists(select user_id from user where email = "${req.body.email}") AS "exists";`,
             (err, results) => {
                 if (err) return console.log(err);
@@ -116,8 +116,8 @@ const controllers = {
                 const salt = bcrypt.genSaltSync(10);
                 const password = bcrypt.hashSync(req.body.password, salt);
 
-                connection.query(
-                    `insert into ${process.env.DB_NAME}.user
+                db.query(
+                    `insert into dbproject.user
                      values (default, "${req.body.first_name}", "${req.body.last_name}", ${req.body.isAdmin},
                              "${req.body.email}", "${password}", curdate());`,
                     (err) => {
@@ -125,9 +125,9 @@ const controllers = {
                     }
                 );
 
-                connection.query(
+                db.query(
                     `select user_id
-                     from ${process.env.DB_NAME}.user
+                     from dbproject.user
                      where email = "${req.body.email}";`,
                     (err, results) => {
                         if (err) return console.log(err);
@@ -142,7 +142,7 @@ const controllers = {
         if (!req.body.email || !req.body.password)
             return res.status(400).send("Invalid User Credentials!");
 
-        connection.query(
+        db.query(
             `select user_id, password
              from user
              where email = "${req.body.email}"`,
@@ -168,7 +168,7 @@ const controllers = {
         )
     }, // 19
     logout: (req, res) => {
-        connection.query(
+        db.query(
             `select user_id
              from user
              where email = "${req.body.email}"`,
@@ -200,7 +200,7 @@ const controllers = {
         if (data.user_id || data.isAdmin)
             return res.status(403).send("Can't change User's signature");
 
-        connection.query(
+        admin.query(
             `select exists(select user_id from user where email = "${data.email}") AS "exists";`,
             (err, results) => {
                 if (results[0].exists === 0)
@@ -236,7 +236,7 @@ const controllers = {
     }, // 19 21
     deleteUser: (req, res) => {
         controllers.logout(req, res);
-        connection.query(
+        admin.query(
             `delete from user where email = "${req.body.email}"`,
             (err) => {
                 if (err) return res.send(err);

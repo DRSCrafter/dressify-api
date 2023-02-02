@@ -1,11 +1,11 @@
-import connection from '../utils/db.js';
+import {db} from '../utils/db.js';
 
 export default {
     getProvidersInCity: (req, res) => {
     //    select distinct name
         // from provider, provideraddresses
         // where provider_id = Provider_provider_id and city = "تهران";
-        connection.query(
+        db.query(
             `select distinct name 
                  from provider, provideraddresses 
                  where provider_id = Provider_provider_id and city = "${req.params.city}";`,

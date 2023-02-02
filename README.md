@@ -38,8 +38,7 @@
    ```sh
    echo "DB_HOST=yourHost
          DB_USERNAME=yourDBUsername
-         DB_PASSWORD=yourDBPassword
-         DB_NAME=yourDBName" >> .env
+         DB_PASSWORD=yourDBPassword >> .env
    ```
 5. Run the API
    ```sh

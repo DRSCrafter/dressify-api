@@ -1,11 +1,11 @@
-import connection from '../utils/db.js';
+import {db, admin} from '../utils/db.js';
 
 const editableEntities = ["name", "discountable", "size", "material", "stock"];
 
 export default {
     getProducts: (req, res) => {
         // SELECT * FROM product;
-        connection.query(
+        db.query(
             'SELECT * FROM product;',
             (err, results) => {
                 if (err) return console.log(err);
@@ -15,7 +15,7 @@ export default {
     }, // 1
     getCategories: (req, res) => {
         // SELECT name FROM productcategory;
-        connection.query(
+        db.query(
             'SELECT name FROM productcategory;',
             (err, results) => {
                 if (err) return console.log(err);
@@ -31,10 +31,10 @@ export default {
         // year(payment.date_paid) = year(now()) and week(payment.date_paid) = week(now())
         // group by product.name
         // order by quantity desc;
-        connection.query(
-            `select product.name, sum(${process.env.DB_NAME}.order.quantity) as quantity
-                from product, ${process.env.DB_NAME}.order, cart, payment
-                where product_id = Product_product_id and cart_id = ${process.env.DB_NAME}.order.Cart_cart_id and cart_id = payment.Cart_cart_id 
+        db.query(
+            `select product.name, sum(dbproject.order.quantity) as quantity
+                from product, dbproject.order, cart, payment
+                where product_id = Product_product_id and cart_id = dbproject.order.Cart_cart_id and cart_id = payment.Cart_cart_id 
                 and year(payment.date_paid) = year(now()) and week(payment.date_paid) = week(now()) 
                 group by product.name
                 order by quantity desc;`,
@@ -52,10 +52,10 @@ export default {
         // year(payment.date_paid) = year(now()) and month(payment.date_paid) = month(now())
         // group by product.name
         // order by quantity desc;
-        connection.query(
-            `select product.name, sum(${process.env.DB_NAME}.order.quantity) as quantity 
-                from product, ${process.env.DB_NAME}.order, cart, payment 
-                where product_id = Product_product_id and cart_id = ${process.env.DB_NAME}.order.Cart_cart_id and cart_id = payment.Cart_cart_id 
+        db.query(
+            `select product.name, sum(dbproject.order.quantity) as quantity 
+                from product, dbproject.order, cart, payment 
+                where product_id = Product_product_id and cart_id = dbproject.order.Cart_cart_id and cart_id = payment.Cart_cart_id 
                 and year(payment.date_paid) = year(now()) and month(payment.date_paid) = month(now()) 
                 group by product.name 
                 order by quantity desc;`,
@@ -68,7 +68,7 @@ export default {
     getSpecialOff: (req, res) => {
         // SELECT distinct name FROM product c join discountCode d on c.product_id = d.Product_product_id
         // where d.discount_precentage > 0.15;
-        connection.query(
+        db.query(
             'SELECT distinct name ' +
                 'FROM product c ' +
                 'join discountCode d ' +
@@ -84,7 +84,7 @@ export default {
         // select distinct p.name
         // from provider p, provider_has_product php, product pr
         // where p.provider_id = php.Provider_provider_id and php.Product_product_id = pr.product_id;
-        connection.query(
+        db.query(
             `select distinct p.name 
                  from provider p, provider_has_product php, product pr 
                  where p.provider_id = php.Provider_provider_id and php.Product_product_id = pr.product_id and pr.product_id = ${req.params.productID};`,
@@ -98,7 +98,7 @@ export default {
         // select p.name
         // from provider p, pricehistory ph
         // where p.provider_id = ph.Provider_provider_id and value = (select min(value) from pricehistory where Product_product_id = 1);
-        connection.query(
+        db.query(
             `select p.name 
                  from provider p, pricehistory ph 
                  where p.provider_id = ph.Provider_provider_id and value = (select min(value) from pricehistory where Product_product_id = ${req.params.productID}) limit 1;`,
@@ -111,7 +111,7 @@ export default {
     getComments: (req, res) => {
         // SELECT review FROM comment c join product p on p.product_id = c.Product_product_id
         // where product_product_id =
-        connection.query(
+        db.query(
             `SELECT review 
                  FROM comment c 
                  join product p 
@@ -129,7 +129,7 @@ export default {
         // where product.name = "شلوار جین آبی"
         // order by star desc
         // limit 3;
-        connection.query(
+        db.query(
             `select star, review 
                  from product, comment 
                  where product.product_id = ${req.params.productID} 
@@ -146,7 +146,7 @@ export default {
         // where product.name = "شلوار جین آبی"
         // order by star asc
         // limit 3;
-        connection.query(
+        db.query(
             `select star, review 
                  from product, comment 
                  where product.product_id = ${req.params.productID} 
@@ -162,9 +162,9 @@ export default {
         // from product p, dbproject.order o, cart c, payment pa
         // where p.product_id = o.Product_product_id and o.Cart_cart_id = c.cart_id and pa.Cart_cart_id = c.cart_id
         // and p.product_id = 1 and pa.date_paid >= DATE(NOW() - INTERVAL 1 MONTH);
-        connection.query(
+        db.query(
             `select p.name, sum(o.quantity) as "Quantity", sum(o.total_cost) as "Total Payment" 
-                 from product p, ${process.env.DB_NAME}.order o, cart c, payment pa 
+                 from product p, dbproject.order o, cart c, payment pa 
                  where p.product_id = o.Product_product_id and o.Cart_cart_id = c.cart_id and pa.Cart_cart_id = c.cart_id 
                  and p.product_id = ${req.params.productID} and pa.date_paid >= DATE(NOW() - INTERVAL 1 MONTH);`,
             (err, results) => {
@@ -177,9 +177,9 @@ export default {
         // select avg(p.cost), count(*)
         // from payment p, cart c, dbproject.order o, product pr
         // where p.Cart_cart_id = c.cart_id and c.cart_id = o.Cart_cart_id and o.Product_product_id = pr.product_id;
-        connection.query(
+        db.query(
             `select avg(p.cost) AS "Average sales", count(*) AS "Sales Count" 
-                from payment p, cart c, ${process.env.DB_NAME}.order o, product pr 
+                from payment p, cart c, dbproject.order o, product pr 
                 where p.Cart_cart_id = c.cart_id and c.cart_id = o.Cart_cart_id and o.Product_product_id = pr.product_id;`,
             (err, results) => {
                 if (err) return console.log(err);
@@ -190,13 +190,13 @@ export default {
     postProduct: (req, res) => {
         const data = req.body;
 
-        connection.query(
+        admin.query(
             `select exists (select product_id from product where name = "${data.name}") AS "exists";`,
             (err, results) => {
                 if (results[0].exists === 1)
                     return res.status(400).send("Product with this name already exists");
 
-                connection.query(
+                admin.query(
                     `insert into product 
                          values (default, "${data.name}", ${data.discountable}, "${data.size}", "${data.material}", ${data.stock}, ${data.category})`,
                     (err, results) => {
@@ -216,7 +216,7 @@ export default {
         if (data.ProductCategory_category_id)
             return res.status(403).send("Can't change Product's signature");
 
-        connection.query(
+        admin.query(
             `select exists (select product_id from product where product_id = ${data.product_id}) AS "exists";`,
             (err, results) => {
                 if (results[0].exists === 0)
@@ -233,7 +233,7 @@ export default {
 
                 query += ` where product_id = "${data.product_id}";`;
 
-                connection.query(
+                admin.query(
                     query,
                     (err) => {
                         if (err) return console.log(err);
@@ -245,7 +245,7 @@ export default {
 
     }, // 20
     deleteProduct: (req, res) => {
-        connection.query(
+        admin.query(
             `select exists (select product_id from product where name = "${req.body.name}") AS "exists";`,
             (err, results) => {
                 if (err) return console.log(err);
@@ -253,7 +253,7 @@ export default {
                 if (results[0].exists === 0)
                     return res.status(400).send("Product doesn't exist");
 
-                connection.query(
+                admin.query(
                     `delete from product where name = "${req.body.name}";`,
                     (err, results) => {
                         if (err) return console.log(err);
