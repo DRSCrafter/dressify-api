@@ -1,4 +1,4 @@
-import {db, admin} from '../utils/db.js';
+import {db, admin} from '../services/db.js';
 
 const editableEntities = ["name", "discountable", "size", "material", "stock"];
 
@@ -199,7 +199,7 @@ export default {
                 admin.query(
                     `insert into product 
                          values (default, "${data.name}", ${data.discountable}, "${data.size}", "${data.material}", ${data.stock}, ${data.category})`,
-                    (err, results) => {
+                    (err) => {
                         if (err) return console.log(err);
                         res.send("Success!");
                     });
@@ -255,7 +255,7 @@ export default {
 
                 admin.query(
                     `delete from product where name = "${req.body.name}";`,
-                    (err, results) => {
+                    (err) => {
                         if (err) return console.log(err);
                         res.send("Success!");
                     }

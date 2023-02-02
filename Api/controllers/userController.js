@@ -1,6 +1,6 @@
-import users from '../utils/users.js';
+import users from '../services/users.js';
 import bcrypt from "bcrypt";
-import {db, admin} from '../utils/db.js';
+import {db, admin} from '../services/db.js';
 
 const editableEntities = ["first_name", "last_name", "isAdmin"];
 
@@ -62,7 +62,7 @@ const controllers = {
             `select o.order_id, p.name, o.quantity, o.total_cost, o.DiscountCode_discount_code_id 
                 from user u, dbproject.order o, product p 
                 where u.user_id = o.User_user_id and o.Product_product_id = p.product_id 
-                and u.email = "${req.header["x-auth-email"]}";`,
+                and u.email = "${req.header("x-auth-email")}";`,
             (err, results) => {
                 if (err) return console.log(err);
                 res.send(results);
@@ -84,7 +84,7 @@ const controllers = {
                  on o.Cart_cart_id = c.cart_id 
                  join payment p 
                  on c.cart_id = p.Cart_cart_id 
-                 where u.email = "${req.header["x-auth-email"]}" 
+                 where u.email = "${req.header("x-auth-email")}" 
                  order by date_paid desc 
                  limit 10;`,
             (err, results) => {
@@ -120,7 +120,7 @@ const controllers = {
                     `insert into dbproject.user
                      values (default, "${req.body.first_name}", "${req.body.last_name}", ${req.body.isAdmin},
                              "${req.body.email}", "${password}", curdate());`,
-                    (err, results) => {
+                    (err) => {
                         if (err) return console.log(err);
                     }
                 );
@@ -132,7 +132,7 @@ const controllers = {
                     (err, results) => {
                         if (err) return console.log(err);
                         const userID = results[0].user_id;
-                        users.push(userID);
+                        users.login(userID);
 
                         let addresses = `insert into dbproject.useraddress values`;
                         for (let address of req.body.addresses)
@@ -181,7 +181,7 @@ const controllers = {
                 if (results.length === 0)
                     return res.status(404).send("User doesn't exist!");
 
-                const exists = users.find(id => id == user.user_id);
+                const exists = users.IDList.find(id => id === user.user_id);
                 if (exists)
                     return res.status(400).send("User is already logged in!");
 
@@ -189,7 +189,7 @@ const controllers = {
                 if (!isVaildPassword)
                     return res.status(400).send("Incorrect Password!");
 
-                users.push(user.user_id);
+                users.login(user.user_id);
                 res.send("Success");
             }
         )
@@ -198,22 +198,13 @@ const controllers = {
         db.query(
             `select user_id
              from user
-             where email = "${req.body.email}"`,
+             where email = "${req.header('x-auth-email')}"`,
             (err, results) => {
                 if (err) return console.log(err);
 
                 const user = results[0];
 
-                if (results.length === 0)
-                    return res.status(404).send("User doesn't exist!");
-
-                const exists = users.find(id => id == user.user_id);
-                if (!exists)
-                    return res.status(400).send("User is not logged in!");
-
-                const index = users.findIndex(id => id == user.user_id);
-                users.splice(index, 1);
-                console.log(users);
+                users.logout(user.user_id);
                 res.send("Success");
             }
         )
@@ -265,7 +256,7 @@ const controllers = {
         db.query(
             `select user_id
                  from dbproject.user
-                 where email = "${req.header['x-auth-email']}";`,
+                 where email = "${req.header("x-auth-email")}";`,
             (err, results) => {
                 if (err) return console.log(err);
                 const userID = results[0].user_id;
@@ -290,7 +281,7 @@ const controllers = {
         db.query(
             `select user_id
                  from dbproject.user
-                 where email = "${req.header['x-auth-email']}";`,
+                 where email = "${req.header("x-auth-email")}";`,
             (err, results) => {
                 if (err) return console.log(err);
                 const userID = results[0].user_id;
@@ -325,7 +316,7 @@ const controllers = {
         db.query(
             `select user_id
                  from dbproject.user
-                 where email = "${req.header['x-auth-email']}";`,
+                 where email = "${req.header("x-auth-email")}";`,
             (err, results) => {
                 if (err) return console.log(err);
                 const userID = results[0].user_id;
@@ -344,7 +335,7 @@ const controllers = {
         db.query(
             `select user_id
                  from dbproject.user
-                 where email = "${req.header['x-auth-email']}";`,
+                 where email = "${req.header("x-auth-email")}";`,
             (err, results) => {
                 if (err) return console.log(err);
                 const userID = results[0].user_id;
