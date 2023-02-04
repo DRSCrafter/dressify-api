@@ -13,10 +13,12 @@ router.get('/topmonth', auth, userController.getTopMonth);
 router.post('/', userController.signUp);
 router.post('/login', userController.login);
 router.post('/logout', auth, userController.logout);
+router.post('/logout/admin', userController.logoutAdmin);
 router.post('/address', auth, userController.postAddress);
 router.post('/phonenumber', auth, userController.postPhoneNumber);
 router.put('/', auth, userController.editUser);
-router.delete('/', auth, userController.deleteUser);
+router.put('/admin', userController.editUserAdmin);
+router.delete('/', userController.deleteUser);
 router.delete('/address', auth, userController.deleteAddress);
 router.delete('/phonenumber', auth, userController.deletePhoneNumber);
 

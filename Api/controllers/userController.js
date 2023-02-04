@@ -184,6 +184,21 @@ const controllers = {
                 res.send("Success");
             }
         )
+    },
+    logoutAdmin: (req, res) => {
+        db.query(
+            `select user_id
+             from user
+             where email = "${req.body.email}"`,
+            (err, results) => {
+                if (err) return console.log(err);
+
+                const user = results[0];
+
+                users.logout(user.user_id);
+                res.send("Success");
+            }
+        )
     }, // 19 21
     editUser: (req, res) => {
         const data = req.body;
@@ -193,6 +208,46 @@ const controllers = {
 
         db.query(
             `select exists(select user_id from user where email = "${req.header('x-auth-email')}") AS "exists";`,
+            (err, results) => {
+                if (results[0].exists === 0)
+                    return res.status(400).send("User doesn't exist!");
+
+                let query = "Update user set ";
+                for (let entity of Object.keys(data)) {
+                    if (entity !== "email" && !editableEntities.includes(entity))
+                        return res.status(400).send("Invalid entities can't be edited!");
+                    if (entity === "password") {
+                        const salt = bcrypt.genSaltSync(10);
+                        const password = bcrypt.hashSync(data.password, salt);
+                        query += `password = "${password}", `;
+                        continue;
+                    }
+                    query += `${entity} = "${data[entity]}", `;
+                }
+                const index = query.lastIndexOf(",");
+                query = query.slice(0, index);
+
+                query += ` where email = "${data.email}";`;
+
+                db.query(
+                    query,
+                    (err) => {
+                        if (err) return console.log(err);
+                        res.send("Success!");
+                    }
+                )
+            }
+        )
+
+    }, // 19 21
+    editUserAdmin: (req, res) => {
+        const data = req.body;
+
+        if (data.user_id || data.isAdmin)
+            return res.status(403).send("Can't change User's signature");
+
+        db.query(
+            `select exists(select user_id from user where email = "${data.email}") AS "exists";`,
             (err, results) => {
                 if (results[0].exists === 0)
                     return res.status(400).send("User doesn't exist!");
@@ -277,7 +332,7 @@ const controllers = {
     },
     deleteUser: (req, res) => {
         controllers.logout(req, res);
-        db.query(
+        admin.query(
             `delete from user where email = "${req.body.email}"`,
             (err) => {
                 if (err) return res.send(err);
