@@ -26,21 +26,24 @@
    ```sh
    git clone https://github.com/DRSCrafter/dressify-api.git
    ```
-2. Go inside the API folder
+2. Execute the SQL Scripts in SQL/Initialization
+3. Go inside the API folder
    ```sh
-   cd Api
+   cd dressify-api-main/Api
    ```
-3. Install the dependencies
+4. Install the dependencies
    ```sh
    npm install
    ```
-4. Set Database info
+5. Set Database info
    ```sh
-   echo "DB_HOST=yourHost
+   echo "DB_HOST=yourDBHost
          DB_USERNAME=yourDBUsername
-         DB_PASSWORD=yourDBPassword >> .env
+         DB_PASSWORD=yourDBPassword
+         DB_ADMIN_USERNAME=yourDBAdminUsername
+         DB_ADMIN_PASSWORD=yourDBAdminPassword" >> .env
    ```
-5. Run the API
+6. Run the API
    ```sh
    npm start
    ```
