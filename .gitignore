@@ -2,4 +2,3 @@
 node_modules
 
 Api/.env
-Api/uncaughtExceptions.log

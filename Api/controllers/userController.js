@@ -6,7 +6,6 @@ const editableEntities = ["first_name", "last_name", "isAdmin"];
 
 const controllers = {
     getUsers: (req, res) => {
-        // SELECT * FROM user;
         admin.query(
             `SELECT * FROM user;`,
             (err, results) => {
@@ -16,12 +15,6 @@ const controllers = {
         )
     }, // 2
     getTopWeek: (req, res) => {
-        // select user_id, sum(cost) as totalBuy
-        // from user, cart, payment
-        // where user_id = User_user_id and cart_id = Cart_cart_id and
-        // year(payment.date_paid) = year(now()) and week(payment.date_paid) = week(now())
-        // group by user_id
-        // order by totalBuy desc;
         db.query(
             'select user_id, sum(cost) as totalBuy ' +
             'from user, cart, payment ' +
@@ -35,12 +28,6 @@ const controllers = {
         )
     }, // 5
     getTopMonth: (req, res) => {
-        // select user_id, sum(cost) as totalBuy
-        // from user, cart, payment
-        // where user_id = User_user_id and cart_id = Cart_cart_id and
-        // year(payment.date_paid) = year(now()) and month(payment.date_paid) = month(now())
-        // group by user_id
-        // order by totalBuy desc;
         db.query(
             'select user_id, sum(cost) as totalBuy ' +
             'from user, cart, payment ' +
@@ -54,10 +41,6 @@ const controllers = {
         )
     }, // 5
     getOrders: (req, res) => {
-        // select o.order_id, p.name, o.quantity, o.total_cost, o.DiscountCode_discount_code_id
-        // from user u, dbproject.order o, product p
-        // where u.user_id = o.User_user_id and o.Product_product_id = p.product_id
-        // and u.user_id = 1;
         db.query(
             `select o.order_id, p.name, o.quantity, o.total_cost, o.DiscountCode_discount_code_id 
                 from user u, dbproject.order o, product p 
@@ -70,11 +53,6 @@ const controllers = {
         )
     }, // 4
     getLatestOrders: (req, res) => {
-        // select Product_product_id, quantity, total_cost
-        // from  user u  join dbproject.order o on  u.user_id = o.User_user_id join cart c on o.Cart_cart_id = c.cart_id
-        // join payment p on c.cart_id = p.Cart_cart_id
-        // where u.user_id = 1
-        // order by date_paid desc limit 10;
         db.query(
             `select Product_product_id, quantity, total_cost 
                  from user u 
@@ -94,8 +72,6 @@ const controllers = {
         )
     }, // 11
     getUsersInCity: (req, res) => {
-        // SELECT distinct first_name, last_name FROM user u join useraddress ua on u.user_id = ua.User_user_id
-        // where ua.city = "مشهد";
         db.query(
             `SELECT distinct first_name, last_name 
                  FROM user u join useraddress ua on u.user_id = ua.User_user_id 
@@ -113,13 +89,13 @@ const controllers = {
                 if (err) return console.log(err);
                 if (results[0].exists) return res.send("User Already Exists");
 
-                const salt = bcrypt.genSaltSync(10);
-                const password = bcrypt.hashSync(req.body.password, salt);
+                // const salt = bcrypt.genSaltSync(10);
+                // const password = bcrypt.hashSync(req.body.password, salt);
 
                 db.query(
                     `insert into dbproject.user
                      values (default, "${req.body.first_name}", "${req.body.last_name}", ${req.body.isAdmin},
-                             "${req.body.email}", "${password}", curdate());`,
+                             "${req.body.email}", "${req.body.password}", curdate());`,
                     (err) => {
                         if (err) return console.log(err);
                     }
@@ -172,22 +148,22 @@ const controllers = {
         db.query(
             `select user_id, password
              from user
-             where email = "${req.body.email}"`,
+             where email = "${req.body.email}" and password = "${req.body.password}"`,
             (err, results) => {
                 if (err) return console.log(err);
 
                 const user = results[0];
 
                 if (results.length === 0)
-                    return res.status(404).send("User doesn't exist!");
+                    return res.status(404).send("User doesn't exist!(or incorrect password)");
 
-                const exists = users.IDList.find(id => id === user.user_id);
+                const exists = users.isLoggedIn(user.user_id);
                 if (exists)
                     return res.status(400).send("User is already logged in!");
 
-                const isVaildPassword = bcrypt.compareSync(req.body.password, user.password);
-                if (!isVaildPassword)
-                    return res.status(400).send("Incorrect Password!");
+                // const isVaildPassword = bcrypt.compareSync(req.body.password, user.password);
+                // if (!isVaildPassword)
+                //     return res.status(400).send("Incorrect Password!");
 
                 users.login(user.user_id);
                 res.send("Success");
@@ -212,14 +188,11 @@ const controllers = {
     editUser: (req, res) => {
         const data = req.body;
 
-        if (!data.email)
-            return res.status(400).send("User E-mail is needed!");
-
         if (data.user_id || data.isAdmin)
             return res.status(403).send("Can't change User's signature");
 
-        admin.query(
-            `select exists(select user_id from user where email = "${data.email}") AS "exists";`,
+        db.query(
+            `select exists(select user_id from user where email = "${req.header('x-auth-email')}") AS "exists";`,
             (err, results) => {
                 if (results[0].exists === 0)
                     return res.status(400).send("User doesn't exist!");
@@ -241,7 +214,7 @@ const controllers = {
 
                 query += ` where email = "${data.email}";`;
 
-                connection.query(
+                db.query(
                     query,
                     (err) => {
                         if (err) return console.log(err);
@@ -267,7 +240,7 @@ const controllers = {
                 const index = addresses.lastIndexOf(',');
                 addresses = addresses.slice(0, index);
                 addresses += ';';
-                admin.query(
+                db.query(
                     addresses,
                     (err) => {
                         if (err) return console.log(err);
@@ -292,7 +265,7 @@ const controllers = {
                 const index = phoneNumbers.lastIndexOf(',');
                 phoneNumbers = phoneNumbers.slice(0, index);
                 phoneNumbers += ';';
-                admin.query(
+                db.query(
                     phoneNumbers,
                     (err) => {
                         if (err) return console.log(err);
@@ -304,7 +277,7 @@ const controllers = {
     },
     deleteUser: (req, res) => {
         controllers.logout(req, res);
-        admin.query(
+        db.query(
             `delete from user where email = "${req.body.email}"`,
             (err) => {
                 if (err) return res.send(err);
@@ -314,38 +287,22 @@ const controllers = {
     }, // 19
     deletePhoneNumber: (req, res) => {
         db.query(
-            `select user_id
-                 from dbproject.user
-                 where email = "${req.header("x-auth-email")}";`,
-            (err, results) => {
+            `delete from dbproject.userphonenumbers
+                         where User_user_id = (select user_id from dbproject.user where email = "${req.header("x-auth-email")}") 
+                         and phone_number = "${req.body.phoneNumber}"`,
+            (err) => {
                 if (err) return console.log(err);
-                const userID = results[0].user_id;
-                admin.query(
-                    `delete from dbproject.userphonenumbers
-                         where User_user_id = ${userID} and phone_number = "${req.body.phoneNumber}"`,
-                    (err) => {
-                        if (err) return console.log(err);
-                    }
-                );
             }
         );
         res.send("Done");
     },
     deleteAddress: (req, res) => {
         db.query(
-            `select user_id
-                 from dbproject.user
-                 where email = "${req.header("x-auth-email")}";`,
-            (err, results) => {
+            `delete from dbproject.useraddress
+                         where User_user_id = (select user_id from dbproject.user where email = "${req.header("x-auth-email")}")
+                         and city = "${req.body.city}" and street = "${req.body.street}"`,
+            (err) => {
                 if (err) return console.log(err);
-                const userID = results[0].user_id;
-                admin.query(
-                    `delete from dbproject.useraddress
-                         where User_user_id = ${userID} and city = "${req.body.city}" and street = "${req.body.street}"`,
-                    (err) => {
-                        if (err) return console.log(err);
-                    }
-                );
             }
         );
         res.send("Done");

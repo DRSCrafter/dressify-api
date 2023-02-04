@@ -4,7 +4,7 @@ import auth from "../middlewares/auth.js";
 
 const router = express.Router();
 
-router.get('/', auth, userController.getUsers);
+router.get('/', userController.getUsers);
 router.get('/orders', auth, userController.getOrders);
 router.get('/latestorders', auth, userController.getLatestOrders);
 router.get('/city/:city', userController.getUsersInCity);

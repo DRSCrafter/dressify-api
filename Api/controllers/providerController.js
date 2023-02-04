@@ -2,9 +2,6 @@ import {db} from '../services/db.js';
 
 export default {
     getProvidersInCity: (req, res) => {
-    //    select distinct name
-        // from provider, provideraddresses
-        // where provider_id = Provider_provider_id and city = "تهران";
         db.query(
             `select distinct name 
                  from provider, provideraddresses 

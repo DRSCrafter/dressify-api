@@ -4,7 +4,6 @@ const editableEntities = ["name", "discountable", "size", "material", "stock"];
 
 export default {
     getProducts: (req, res) => {
-        // SELECT * FROM product;
         db.query(
             'SELECT * FROM product;',
             (err, results) => {
@@ -14,7 +13,6 @@ export default {
         )
     }, // 1
     getCategories: (req, res) => {
-        // SELECT name FROM productcategory;
         db.query(
             'SELECT name FROM productcategory;',
             (err, results) => {
@@ -24,13 +22,6 @@ export default {
         )
     }, // 3
     getTopWeek: (req, res) => {
-        // select product.name, sum(dbproject.order.quantity) as quantity
-        // from product, dbproject.order, cart, payment
-        // where product_id = Product_product_id and cart_id = dbproject.order.Cart_cart_id and
-        // cart_id = payment.Cart_cart_id and
-        // year(payment.date_paid) = year(now()) and week(payment.date_paid) = week(now())
-        // group by product.name
-        // order by quantity desc;
         db.query(
             `select product.name, sum(dbproject.order.quantity) as quantity
                 from product, dbproject.order, cart, payment
@@ -45,13 +36,6 @@ export default {
         )
     }, // 6
     getTopMonth: (req, res) => {
-        // select product.name, sum(dbproject.order.quantity) as quantity
-        // from product, dbproject.order, cart, payment
-        // where product_id = Product_product_id and cart_id = dbproject.order.Cart_cart_id and
-        // cart_id = payment.Cart_cart_id and
-        // year(payment.date_paid) = year(now()) and month(payment.date_paid) = month(now())
-        // group by product.name
-        // order by quantity desc;
         db.query(
             `select product.name, sum(dbproject.order.quantity) as quantity 
                 from product, dbproject.order, cart, payment 
@@ -66,8 +50,6 @@ export default {
         )
     }, // 6
     getSpecialOff: (req, res) => {
-        // SELECT distinct name FROM product c join discountCode d on c.product_id = d.Product_product_id
-        // where d.discount_precentage > 0.15;
         db.query(
             'SELECT distinct name ' +
                 'FROM product c ' +
@@ -81,10 +63,7 @@ export default {
         )
     }, // 7
     getProviders: (req, res) => {
-        // select distinct p.name
-        // from provider p, provider_has_product php, product pr
-        // where p.provider_id = php.Provider_provider_id and php.Product_product_id = pr.product_id;
-        db.query(
+        admin.query(
             `select distinct p.name 
                  from provider p, provider_has_product php, product pr 
                  where p.provider_id = php.Provider_provider_id and php.Product_product_id = pr.product_id and pr.product_id = ${req.params.productID};`,
@@ -95,10 +74,7 @@ export default {
         )
     }, // 8
     getCheapestProvider: (req, res) => {
-        // select p.name
-        // from provider p, pricehistory ph
-        // where p.provider_id = ph.Provider_provider_id and value = (select min(value) from pricehistory where Product_product_id = 1);
-        db.query(
+        admin.query(
             `select p.name 
                  from provider p, pricehistory ph 
                  where p.provider_id = ph.Provider_provider_id and value = (select min(value) from pricehistory where Product_product_id = ${req.params.productID}) limit 1;`,
@@ -109,8 +85,6 @@ export default {
         )
     }, // 9
     getComments: (req, res) => {
-        // SELECT review FROM comment c join product p on p.product_id = c.Product_product_id
-        // where product_product_id =
         db.query(
             `SELECT review 
                  FROM comment c 
@@ -124,11 +98,6 @@ export default {
         )
     }, // 12
     getBestComments: (req, res) => {
-        // select star, review
-        // from product, comment
-        // where product.name = "شلوار جین آبی"
-        // order by star desc
-        // limit 3;
         db.query(
             `select star, review 
                  from product, comment 
@@ -141,11 +110,6 @@ export default {
         )
     }, // 13
     getWorstComments: (req, res) => {
-        // select star, review
-        // from product, comment
-        // where product.name = "شلوار جین آبی"
-        // order by star asc
-        // limit 3;
         db.query(
             `select star, review 
                  from product, comment 
@@ -158,11 +122,7 @@ export default {
         )
     }, // 14
     getSalesStats: (req, res) => {
-        // select p.name, sum(o.quantity) as "Quantity", sum(o.total_cost) as "Total Payment"
-        // from product p, dbproject.order o, cart c, payment pa
-        // where p.product_id = o.Product_product_id and o.Cart_cart_id = c.cart_id and pa.Cart_cart_id = c.cart_id
-        // and p.product_id = 1 and pa.date_paid >= DATE(NOW() - INTERVAL 1 MONTH);
-        db.query(
+        admin.query(
             `select p.name, sum(o.quantity) as "Quantity", sum(o.total_cost) as "Total Payment" 
                  from product p, dbproject.order o, cart c, payment pa 
                  where p.product_id = o.Product_product_id and o.Cart_cart_id = c.cart_id and pa.Cart_cart_id = c.cart_id 
@@ -174,11 +134,8 @@ export default {
         )
     }, // 15
     getAverageSales: (req, res) => {
-        // select avg(p.cost), count(*)
-        // from payment p, cart c, dbproject.order o, product pr
-        // where p.Cart_cart_id = c.cart_id and c.cart_id = o.Cart_cart_id and o.Product_product_id = pr.product_id;
-        db.query(
-            `select avg(p.cost) AS "Average sales", count(*) AS "Sales Count" 
+        admin.query(
+            `select avg(p.cost) AS "Average sales", sum(o.quantity) AS "Sales Count" 
                 from payment p, cart c, dbproject.order o, product pr 
                 where p.Cart_cart_id = c.cart_id and c.cart_id = o.Cart_cart_id and o.Product_product_id = pr.product_id;`,
             (err, results) => {
@@ -198,7 +155,9 @@ export default {
 
                 admin.query(
                     `insert into product 
-                         values (default, "${data.name}", ${data.discountable}, "${data.size}", "${data.material}", ${data.stock}, ${data.category})`,
+                         values (default, "${data.name}", ${data.discountable}, "${data.size}", "${data.material}", ${data.stock}, ${data.category});
+                         insert into provider_has_product
+                         values ((select provider_id from provider where name = "${data.provider}"), LAST_INSERT_ID())`,
                     (err) => {
                         if (err) return console.log(err);
                         res.send("Success!");
